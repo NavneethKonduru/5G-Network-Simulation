@@ -1,0 +1,25 @@
+# 5G Emphasis Configuration
+# Use this configuration to emphasize 5G Technology aspects
+
+sdn:
+  enabled: false
+
+wireless:
+  enabled: false
+
+_5g:
+  enabled: true
+  base_stations:
+    - id: "gNodeB-1"
+      cell_id: "cell-100"
+      band: "n78"
+  slices:
+    - id: "slice-embb"
+      type: "eMBB"
+    - id: "slice-urllc"
+      type: "URLLC"
+  reporting_emphasis:
+    - "5g_base_stations"
+    - "network_slicing"
+    - "qos_management"
+    - "urllc_embb_mmtc"
