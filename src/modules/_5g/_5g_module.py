@@ -241,12 +241,38 @@ class _5gModule:
                 for bs in active_bs:
                     slice_obj.allocate_resources(bs.bs_id, bandwidth_per_bs)
 
-    def simulate_5g_transmission(self, src_user: str, msg_type: str):
+    def simulate_5g_transmission(self, src_user: str, msg_type: str, content: str = ""):
         """Simulate 5G characteristics for a message"""
         if not self.is_active:
             return
 
+        if not hasattr(self, 'band'):
+            self.band = "n257 (mmWave, 28 GHz)"
+
         print(f"\n=======================================================")
+        if content.startswith("/compute"):
+            print(f"[5G MEC] -> Edge Computing task requested by '{src_user}'.")
+            print(f"[5G MEC] -> Routing task to Multi-Access Edge Computing (MEC) Server at the Base Station...")
+            time.sleep(0.1)
+            print(f"[5G MEC] -> Task completed locally at the Edge.")
+            print(f"[5G MEC] -> MEC Latency: 1.2ms (Ultra-Low Latency)")
+            print(f"[5G MEC] -> Cloud Latency equivalent would be: 45.8ms")
+            print(f"=======================================================\n")
+            return
+            
+        if content.startswith("/blockage"):
+            print(f"[5G NR PHY] -> WARNING: Severe signal degradation detected!")
+            print(f"[5G NR PHY] -> Physical blockage (e.g., vehicle or building) obstructing mmWave Line-of-Sight.")
+            time.sleep(0.4)
+            print(f"[gNodeB] -> Executing immediate frequency fallback mechanisms...")
+            print(f"[gNodeB] -> Dropping {self.band} connection.")
+            self.band = "n78 (Sub-6GHz, 3.5 GHz)"
+            time.sleep(0.3)
+            print(f"[gNodeB] -> Successfully attached to fallback band: {self.band}")
+            print(f"[gNodeB] -> Connection saved via Dual Connectivity (EN-DC).")
+            print(f"=======================================================\n")
+            return
+
         print(f"[5G CORE] Intercepted {msg_type} from UE '{src_user}'")
         
         # Determine QoS / Network Slice
@@ -255,14 +281,14 @@ class _5gModule:
         print(f"[5G CORE] -> Assigning to Network Slice: {slice_type} (Dynamic QoS)")
         time.sleep(0.3)
         
-        print(f"[5G RAN] -> Allocating Radio Resources on n78 band (3.5 GHz)...")
+        print(f"[5G RAN] -> Allocating Radio Resources on {self.band}...")
         time.sleep(0.3)
         
         print(f"[gNodeB] -> Massive MIMO Beamforming engaged. Steering beam toward UE '{src_user}'...")
         time.sleep(0.4)
         
         # Simulate signal
-        rsrp = random.uniform(-90.0, -65.0)
+        rsrp = random.uniform(-90.0, -65.0) if "Sub-6GHz" in self.band else random.uniform(-75.0, -50.0)
         print(f"[5G PHY] -> Transmission complete. UE Received RSRP: {rsrp:.1f}dBm")
         print(f"=======================================================\n")
 

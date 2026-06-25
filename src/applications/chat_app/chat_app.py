@@ -117,7 +117,8 @@ class NetworkingApp:
             if '_5g' in self.modules and self.modules['_5g'].is_active:
                 self.modules['_5g'].simulate_5g_transmission(
                     src_user=message.username,
-                    msg_type=message.type.name
+                    msg_type=message.type.name,
+                    content=message.content
                 )
 
     def start_client(self, username: str):
