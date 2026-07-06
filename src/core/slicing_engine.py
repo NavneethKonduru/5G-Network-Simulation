@@ -53,7 +53,7 @@ class SliceManager:
             demand = urllc.active_clients * 50.0 # 50 Mbps per autonomous car
             allocated = min(demand, remaining_bw)
             urllc.allocated_bw = max(allocated, urllc.guaranteed_bw * 0.1)
-            urllc.current_load = min(100.0, (demand / urllc.allocated_bw) * 100) if urllc.allocated_bw > 0 else 0
+            urllc.current_load = (demand / urllc.guaranteed_bw) * 100 if urllc.guaranteed_bw > 0 else 0
             remaining_bw -= urllc.allocated_bw
 
         # 2. Fulfill eMBB demands
@@ -62,9 +62,9 @@ class SliceManager:
             demand = embb.active_clients * 500.0 # 500 Mbps per 4K VR stream
             allocated = min(demand, remaining_bw)
             embb.allocated_bw = allocated
-            embb.current_load = min(100.0, (demand / embb.allocated_bw) * 100) if embb.allocated_bw > 0 else 0
-            if embb.current_load >= 100.0:
-                embb.packets_dropped += int((embb.current_load - 100) / 10) # Simulate drops
+            embb.current_load = (demand / embb.guaranteed_bw) * 100 if embb.guaranteed_bw > 0 else 0
+            if demand > embb.allocated_bw:
+                embb.packets_dropped += int((demand - embb.allocated_bw) / 10) # Simulate drops
             remaining_bw -= embb.allocated_bw
 
         # 3. Fulfill mMTC demands
@@ -73,7 +73,7 @@ class SliceManager:
             demand = mmtc.active_clients * 10.0 # 10 Mbps per IoT cluster
             allocated = min(demand, remaining_bw)
             mmtc.allocated_bw = allocated
-            mmtc.current_load = min(100.0, (demand / mmtc.allocated_bw) * 100) if mmtc.allocated_bw > 0 else 0
+            mmtc.current_load = (demand / mmtc.guaranteed_bw) * 100 if mmtc.guaranteed_bw > 0 else 0
 
     def tick(self):
         for s in self.slices.values():
