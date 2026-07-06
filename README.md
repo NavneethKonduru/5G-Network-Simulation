@@ -1,43 +1,65 @@
-# 5G Network Simulation Engine 📶
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Ericsson_logo.svg/1024px-Ericsson_logo.svg.png" width="100" />
+  <h1>🌐 5G Nexus Orchestrator</h1>
+  <p><strong>Enterprise-Grade 5G Core Network Slicing & Massive MIMO Simulator</strong></p>
+</div>
 
-A full-stack, split-screen **5G Networking simulation engine** built to visually and technically demonstrate next-generation mobile broadband concepts like Network Slicing, massive MIMO, dynamic bandwidth allocation, and edge computing integration.
+---
 
-## 🌟 Overview
-This project simulates an advanced 5G-oriented networking stack from the ground up, featuring a custom Python backend that powers both a headless **Terminal CLI Application** and a stunning **React-based Web Dashboard**. 
+## ⚡ Overview
+The **5G Nexus Orchestrator** is a cutting-edge Python and React-based simulation engine designed to mathematically and visually demonstrate next-generation 5G telecommunications architectures. 
 
-It focuses on handling ultra-reliable low-latency communication (URLLC), enhanced mobile broadband (eMBB), and massive machine-type communications (mMTC) by dynamically altering network characteristics on the fly.
+Unlike traditional ad-hoc MANET simulators that focus on omnidirectional path-loss, this project models a **5G Edge Core** responsible for dynamic Quality of Service (QoS) throttling, mmWave Beamforming, and Network Slicing.
 
-## 🎯 Key Features
+---
 
-### 1. Dynamic Network Slicing
-- Demonstrates how a single physical network infrastructure can be logically partitioned into multiple virtual networks ("slices").
-- Simulates assigning independent bandwidth, QoS, and latency guarantees tailored to specific use cases (e.g., IoT sensors vs. HD video streaming).
+## 🎯 Core Engineering Features
 
-### 2. High-Frequency Attenuation & MIMO
-- Simulates millimeter-wave (mmWave) characteristics, including rapid signal degradation over distance and through obstacles.
-- Illustrates massive MIMO (Multiple Input, Multiple Output) techniques by forming focused signal beams to track mobile users, dynamically mitigating interference.
+### 1. Dynamic Network Slicing & QoS
+The Python Core orchestrates a strictly prioritized bandwidth pool across three primary 5G slices:
+- 🔴 **URLLC (Ultra-Reliable Low Latency Communications)**: Guaranteed sub-millisecond latency. Priority 1 routing designed for Autonomous Vehicles and remote surgery.
+- 🔵 **eMBB (Enhanced Mobile Broadband)**: High-bandwidth slice for 4K VR/AR Streaming.
+- 🟢 **mMTC (Massive Machine Type Communications)**: Low-bandwidth, high-density slice for thousands of IoT sensors.
 
-### 3. Edge Computing & Low Latency Routing
-- Nodes actively calculate the closest Edge computing server to offload heavy processing tasks.
-- Illustrates how moving compute closer to the end-user dramatically drops round-trip time (RTT) for URLLC applications like autonomous vehicles.
+> **The Physics Engine** actively monitors network saturation. If the total requested bandwidth exceeds the `10,000 Mbps` edge server capacity, the engine will aggressively throttle (packet drop) the eMBB and mMTC slices to guarantee the URLLC Service Level Agreement (SLA).
 
-## 🛠️ Architecture Stack
-- **Backend Core**: Python 3, custom Socket.IO application layer, 5G Modulator Engine, Slice Manager.
-- **Frontend Visualization**: React, Vite, D3.js Force Simulation, Network Slicing Overlay.
-- **Communication**: Bidirectional low-latency WebSockets mapping Python events directly to React state hooks.
+### 2. Massive MIMO & Beam Steering
+Traditional Wi-Fi radiates power in a circle. 5G mmWave utilizes **Massive MIMO array gains** to physically steer concentrated beams of RF energy at moving targets.
+- The `BeamformingEngine` calculates direct trigonometric steering vectors and beamwidths dynamically.
+- The React visualizer renders these vectors as directional microwave cones tracking the User Equipment (UE).
+
+### 3. Enterprise Dashboard Visualization
+The frontend eschews typical "hacker" UI tropes in favor of a pristine, professional **Ericsson/Cisco-style Enterprise Dashboard**.
+- High-performance **HTML5 Canvas** rendering for MIMO beams.
+- Live-updating CSS-Grid telemetry metrics.
+- Asynchronous multi-threaded Python backend bridged via low-latency `Socket.IO`.
+
+---
 
 ## 🚀 Getting Started
 
-### 1. Launch the Visual Dashboard
-To start the React frontend and Python backend simultaneously:
-```bash
-./run_dashboard.sh
-```
-Then visit `http://localhost:5173` in your browser.
+### Prerequisites
+- Python 3.9+
+- Node.js (v16+)
 
-### 2. Run Headless Simulation
-To run the raw backend engine for terminal-based testing:
+### Launching the Environment
+You can launch both the Python 5G Core and the React Enterprise Dashboard concurrently using the unified boot script:
+
 ```bash
-python3 src/applications/chat_app/chat_app.py --config configs/_5g_config.yaml --server
+chmod +x run_5g_demo.sh
+./run_5g_demo.sh
 ```
+
+Navigate to `http://localhost:5175` to interact with the Nexus Orchestrator.
+
+---
+
+## 🧪 Computational Testing
+The core slicing algorithms are backed by a rigorous Python `unittest` suite that mathematically verifies bandwidth starvation under extreme edge-case load scenarios (e.g., spawning 200 autonomous vehicles into a congested 4K video network).
+
+```bash
+python3 src/test_5g_core.py
+```
+
+---
 *Built as a capstone exploration into next-generation 5G cellular architectures.*
