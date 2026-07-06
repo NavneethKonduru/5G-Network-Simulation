@@ -28,14 +28,14 @@ class NetworkSlice:
         }
 
 class SliceManager:
-    def __init__(self, total_bandwidth_mbps: float = 10000.0):
+    def __init__(self, total_bandwidth_mbps: float = 6000.0):
         self.total_bandwidth = total_bandwidth_mbps
         self.slices: Dict[str, NetworkSlice] = {}
         
-        # Default 5G Slices
+        # Default 5G Slices (Total 6000 Mbps)
         self.add_slice("SLICE_URLLC", "URLLC", guaranteed_bw=2000.0, max_latency_ms=1.0)
-        self.add_slice("SLICE_eMBB", "eMBB", guaranteed_bw=6000.0, max_latency_ms=20.0)
-        self.add_slice("SLICE_mMTC", "mMTC", guaranteed_bw=2000.0, max_latency_ms=100.0)
+        self.add_slice("SLICE_eMBB", "eMBB", guaranteed_bw=4000.0, max_latency_ms=20.0)
+        self.add_slice("SLICE_mMTC", "mMTC", guaranteed_bw=1000.0, max_latency_ms=100.0)
         
     def add_slice(self, slice_id, slice_type, guaranteed_bw, max_latency_ms):
         self.slices[slice_id] = NetworkSlice(slice_id, slice_type, guaranteed_bw, max_latency_ms)
@@ -59,7 +59,7 @@ class SliceManager:
         # 2. Fulfill eMBB demands
         embb = self.slices.get("SLICE_eMBB")
         if embb:
-            demand = embb.active_clients * 3000.0 # 3000 Mbps per 4K VR streaming cluster
+            demand = embb.active_clients * 2000.0 # 2000 Mbps per 4K VR streaming cluster
             allocated = min(demand, remaining_bw)
             embb.allocated_bw = allocated
             embb.current_load = (demand / embb.guaranteed_bw) * 100 if embb.guaranteed_bw > 0 else 0
@@ -82,4 +82,9 @@ class SliceManager:
         self.allocate_resources()
 
     def get_state(self):
-        return [s.to_dict() for s in self.slices.values()]
+        total_allocated = sum(s.allocated_bw for s in self.slices.values())
+        return {
+            "total_capacity": self.total_bandwidth,
+            "total_allocated": total_allocated,
+            "slices": [s.to_dict() for s in self.slices.values()]
+        }

@@ -57,11 +57,29 @@ function App() {
       <main className="nexus-grid">
         {/* Left Column: Slices */}
         <section className="side-panel left-panel">
-          <div className="panel-header">
-            <h2>Network Slices</h2>
-            <button className="clear-btn" onClick={handleClear}>RESET</button>
+          <div className="panel-header" style={{flexDirection: 'column', alignItems: 'flex-start', gap: '10px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+              <h2>Network Slices</h2>
+              <button className="clear-btn" onClick={handleClear}>RESET</button>
+            </div>
+            {gameState.slices && gameState.slices.total_capacity && (
+               <div style={{width: '100%', padding: '10px', background: '#F1F5F9', borderRadius: '8px', border: '1px solid #CBD5E1'}}>
+                 <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px'}}>
+                   <span>Total Server Capacity</span>
+                   <span>{gameState.slices.total_allocated.toFixed(0)} / {gameState.slices.total_capacity} Mbps</span>
+                 </div>
+                 <div style={{height: '6px', background: '#E2E8F0', borderRadius: '4px', overflow: 'hidden'}}>
+                   <div style={{
+                     height: '100%', 
+                     width: `${Math.min(100, (gameState.slices.total_allocated / gameState.slices.total_capacity) * 100)}%`, 
+                     backgroundColor: gameState.slices.total_allocated >= gameState.slices.total_capacity ? '#E11D48' : '#0284C7',
+                     transition: 'width 0.3s ease'
+                   }}></div>
+                 </div>
+               </div>
+            )}
           </div>
-          <SliceDashboard slices={gameState.slices} />
+          <SliceDashboard slices={gameState.slices.slices || []} />
         </section>
 
         {/* Center Column: Radar/Beamforming */}

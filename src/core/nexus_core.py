@@ -24,7 +24,7 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # 5G Core Components
-slice_manager = SliceManager(total_bandwidth_mbps=10000.0)
+slice_manager = SliceManager(total_bandwidth_mbps=6000.0)
 beam_engine = BeamformingEngine()
 
 # State
