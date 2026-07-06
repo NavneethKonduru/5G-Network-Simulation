@@ -50,7 +50,7 @@ class SliceManager:
         # 1. Fulfill URLLC demands first
         urllc = self.slices.get("SLICE_URLLC")
         if urllc:
-            demand = urllc.active_clients * 50.0 # 50 Mbps per autonomous car
+            demand = urllc.active_clients * 500.0 # 500 Mbps per autonomous car
             allocated = min(demand, remaining_bw)
             urllc.allocated_bw = max(allocated, urllc.guaranteed_bw * 0.1)
             urllc.current_load = (demand / urllc.guaranteed_bw) * 100 if urllc.guaranteed_bw > 0 else 0
@@ -59,7 +59,7 @@ class SliceManager:
         # 2. Fulfill eMBB demands
         embb = self.slices.get("SLICE_eMBB")
         if embb:
-            demand = embb.active_clients * 500.0 # 500 Mbps per 4K VR stream
+            demand = embb.active_clients * 3000.0 # 3000 Mbps per 4K VR streaming cluster
             allocated = min(demand, remaining_bw)
             embb.allocated_bw = allocated
             embb.current_load = (demand / embb.guaranteed_bw) * 100 if embb.guaranteed_bw > 0 else 0
@@ -70,7 +70,7 @@ class SliceManager:
         # 3. Fulfill mMTC demands
         mmtc = self.slices.get("SLICE_mMTC")
         if mmtc:
-            demand = mmtc.active_clients * 10.0 # 10 Mbps per IoT cluster
+            demand = mmtc.active_clients * 500.0 # 500 Mbps per IoT cluster
             allocated = min(demand, remaining_bw)
             mmtc.allocated_bw = allocated
             mmtc.current_load = (demand / mmtc.guaranteed_bw) * 100 if mmtc.guaranteed_bw > 0 else 0
