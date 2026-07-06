@@ -93,27 +93,39 @@ body {
 
 .nexus-grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 380px 1fr 340px;
   flex: 1;
   overflow: hidden;
+  background: var(--bg-color);
 }
 
-.slicing-panel {
+.side-panel {
   background: var(--panel-bg);
-  border-right: 1px solid var(--border-color);
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.02);
+  box-shadow: 0 0 20px rgba(0,0,0,0.03);
   z-index: 5;
+}
+
+.left-panel {
+  border-right: 1px solid var(--border-color);
+}
+
+.right-panel {
+  border-left: 1px solid var(--border-color);
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.center-header {
+  justify-content: center;
 }
 
 .panel-header h2 {

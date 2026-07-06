@@ -55,38 +55,18 @@ function App() {
       </header>
 
       <main className="nexus-grid">
-        {/* Left Column: Slicing UI */}
-        <section className="slicing-panel">
+        {/* Left Column: Slices */}
+        <section className="side-panel left-panel">
           <div className="panel-header">
-            <h2>Dynamic Network Slicing</h2>
-            <button className="clear-btn" onClick={handleClear}>RESET TOPOLOGY</button>
+            <h2>Network Slices</h2>
+            <button className="clear-btn" onClick={handleClear}>RESET</button>
           </div>
-          
-          <div className="spawn-controls" style={{marginTop: 0, marginBottom: '2rem'}}>
-            <h3>Inject Traffic Workloads</h3>
-            <div className="spawn-buttons">
-              <button className="btn-urllc" onClick={() => handleSpawn('URLLC')}>
-                + Autonomous Vehicle (URLLC)
-              </button>
-              <button className="btn-embb" onClick={() => handleSpawn('eMBB')}>
-                + 4K VR Headset (eMBB)
-              </button>
-              <button className="btn-mmtc" onClick={() => handleSpawn('mMTC')}>
-                + 10x IoT Sensors (mMTC)
-              </button>
-            </div>
-            
-            <div className="scenario-log" style={{marginTop: '1.5rem', padding: '1rem', background: '#F1F5F9', borderRadius: '8px', fontSize: '0.75rem', borderLeft: '4px solid #0284C7'}}>
-              <strong>Simulation Purpose:</strong> Watch what happens when the network hits 100% capacity. Spawning a URLLC vehicle will force the Edge Server to actively throttle (drop packets from) the eMBB VR headsets to guarantee 1ms latency for the car. This proves 5G Network Slicing QoS.
-            </div>
-          </div>
-          
           <SliceDashboard slices={gameState.slices} />
         </section>
 
-        {/* Right Column: Radar/Beamforming */}
+        {/* Center Column: Radar/Beamforming */}
         <section className="beamforming-panel">
-          <div className="panel-header">
+          <div className="panel-header center-header">
             <h2>Massive MIMO Beam Steering Visualizer</h2>
           </div>
           <div className="canvas-wrapper">
@@ -96,6 +76,33 @@ function App() {
                 beams={gameState.beams} 
                 mappings={gameState.mappings}
               />
+          </div>
+        </section>
+
+        {/* Right Column: Controls */}
+        <section className="side-panel right-panel">
+          <div className="panel-header">
+            <h2>Edge Controls</h2>
+          </div>
+          
+          <div className="spawn-controls">
+            <h3>Inject Traffic</h3>
+            <div className="spawn-buttons">
+              <button className="btn-urllc" onClick={() => handleSpawn('URLLC')}>
+                + Auto Vehicle (URLLC)
+              </button>
+              <button className="btn-embb" onClick={() => handleSpawn('eMBB')}>
+                + 4K VR Headset (eMBB)
+              </button>
+              <button className="btn-mmtc" onClick={() => handleSpawn('mMTC')}>
+                + 10x Sensors (mMTC)
+              </button>
+            </div>
+            
+            <div className="scenario-log" style={{marginTop: '2rem', padding: '1rem', background: '#F8FAFC', borderRadius: '8px', fontSize: '0.8rem', borderLeft: '4px solid #0284C7', color: '#334155', lineHeight: '1.5'}}>
+              <strong style={{display: 'block', marginBottom: '8px', color: '#0F172A'}}>Simulation Objective:</strong>
+              Monitor the Edge Server's QoS response under load. As eMBB traffic consumes bandwidth, spawning a URLLC client forces the 5G Core to aggressively throttle lower-priority streams to guarantee 1ms latency for mission-critical applications.
+            </div>
           </div>
         </section>
       </main>
