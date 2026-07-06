@@ -149,24 +149,24 @@ const BeamVisualizer = ({ aps, clients, beams, mappings }) => {
        
        // UE Shadow
        ctx.beginPath();
-       ctx.arc(x, y + 2, 8, 0, 2*Math.PI);
-       ctx.fillStyle = 'rgba(0,0,0,0.1)';
+       ctx.arc(x, y + 3, 12, 0, 2*Math.PI);
+       ctx.fillStyle = 'rgba(0,0,0,0.15)';
        ctx.fill();
        
        // UE Dot
        ctx.beginPath();
-       ctx.arc(x, y, 7, 0, 2*Math.PI);
+       ctx.arc(x, y, 10, 0, 2*Math.PI);
        ctx.fillStyle = '#FFFFFF';
        ctx.fill();
        ctx.strokeStyle = stroke;
-       ctx.lineWidth = 3;
+       ctx.lineWidth = 4;
        ctx.stroke();
        
        // Label
        ctx.fillStyle = '#0F172A';
-       ctx.font = '600 10px Outfit, sans-serif';
+       ctx.font = '800 12px Outfit, sans-serif';
        ctx.textAlign = 'center';
-       ctx.fillText(sliceReq, x, y - 12);
+       ctx.fillText(sliceReq, x, y - 16);
     });
 
   }, [aps, clients, beams, mappings]);

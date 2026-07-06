@@ -70,7 +70,7 @@ class SliceManager:
         # 3. Fulfill mMTC demands
         mmtc = self.slices.get("SLICE_mMTC")
         if mmtc:
-            demand = mmtc.active_clients * 0.1 # 100 Kbps per IoT sensor
+            demand = mmtc.active_clients * 10.0 # 10 Mbps per IoT cluster
             allocated = min(demand, remaining_bw)
             mmtc.allocated_bw = allocated
             mmtc.current_load = min(100.0, (demand / mmtc.allocated_bw) * 100) if mmtc.allocated_bw > 0 else 0

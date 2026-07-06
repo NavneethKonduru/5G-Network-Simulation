@@ -93,7 +93,7 @@ body {
 
 .nexus-grid {
   display: grid;
-  grid-template-columns: 380px 1fr 340px;
+  grid-template-columns: minmax(320px, 1fr) 2fr minmax(320px, 1fr);
   flex: 1;
   overflow: hidden;
   background: var(--bg-color);

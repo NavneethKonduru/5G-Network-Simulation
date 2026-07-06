@@ -27,7 +27,7 @@ const SliceDashboard = ({ slices }) => {
           <div className="slice-metrics">
             <div className="metric">
               <label>Allocated</label>
-              <span>{slice.allocated_bw.toFixed(0)} Mbps</span>
+              <span>{slice.allocated_bw.toFixed(1)} Mbps</span>
             </div>
             <div className="metric">
               <label>Guaranteed</label>
