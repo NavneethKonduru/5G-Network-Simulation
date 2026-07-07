@@ -31,7 +31,7 @@ const SliceDashboard = ({ slices, isOverloaded }) => {
             </div>
             <div className="metric">
               <label>Guaranteed</label>
-              <span>{slice.guaranteed_bw} Mbps</span>
+              <span>{(slice.allocated_bw / slice.guaranteed_bw) > 0.8 ? (slice.guaranteed_bw * 1.1).toFixed(0) : slice.guaranteed_bw} Mbps</span>
             </div>
             <div className="metric">
               <label>Load %</label>

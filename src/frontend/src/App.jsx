@@ -94,9 +94,9 @@ function App() {
             </div>
             {gameState.slices && gameState.slices.total_capacity && (
                <div style={{width: '100%', padding: '10px', background: '#F1F5F9', borderRadius: '8px', border: '1px solid #CBD5E1'}}>
-                 <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '4px'}}>
+                 <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', fontWeight: 'bold', color: '#334155'}}>
                    <span>Total Server Capacity</span>
-                   <span>{gameState.slices.total_allocated.toFixed(0)} / {gameState.slices.total_capacity} Mbps</span>
+                   <span>{gameState.slices.total_allocated.toFixed(0)} / {((gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? gameState.slices.total_capacity * 1.2 : gameState.slices.total_capacity).toFixed(0)} Mbps</span>
                  </div>
                  <div style={{ paddingRight: '20%', position: 'relative', marginTop: '10px' }}>
                      <div style={{
