@@ -1,8 +1,5 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Ericsson_logo.svg/1024px-Ericsson_logo.svg.png" width="120" />
-  <br/><br/>
-  
-  # 📡 5G Nexus Orchestrator
+  <h1>📡 5G Nexus Orchestrator</h1>
   **Enterprise-Grade 5G Core Network Slicing & Massive MIMO Simulator**
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
