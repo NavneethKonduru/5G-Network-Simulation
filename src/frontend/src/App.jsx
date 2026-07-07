@@ -9,6 +9,7 @@ const socket = io('http://localhost:5001');
 
 function App() {
   const [gameState, setGameState] = useState(null);
+  const [isOverloaded, setIsOverloaded] = useState(false);
 
   useEffect(() => {
     socket.on('5g_state', (data) => {
@@ -17,6 +18,19 @@ function App() {
     return () => socket.off('5g_state');
   }, []);
 
+  useEffect(() => {
+    if (!gameState || !gameState.slices) return;
+    
+    if (gameState.slices.total_allocated >= gameState.slices.total_capacity) {
+      const timer = setTimeout(() => {
+        setIsOverloaded(true);
+      }, 1500); // 1.5s buffer
+      return () => clearTimeout(timer);
+    } else {
+      setIsOverloaded(false);
+    }
+  }, [gameState?.slices?.total_allocated, gameState?.slices?.total_capacity]);
+
   const handleSpawn = (sliceType) => {
     socket.emit('spawn_client', {
       id: `UE_${Math.floor(Math.random() * 1000)}`,
@@ -24,6 +38,10 @@ function App() {
       y: Math.floor(Math.random() * 800) + 100,
       slice: sliceType
     });
+  };
+
+  const handleRemove = (sliceType) => {
+    socket.emit('remove_client_by_type', { slice: sliceType });
   };
 
   const handleClear = () => {
@@ -39,6 +57,18 @@ function App() {
 
   return (
     <div className="nexus-dashboard">
+      {isOverloaded && (
+        <div className="critical-alert-overlay">
+          <div className="critical-alert-modal">
+            <h2>CRITICAL WARNING</h2>
+            <p>
+              Edge Server Capacity (50 Gbps) Exceeded.<br/><br/>
+              Initiating QoS Throttling. Dropping packets for <strong>eMBB (VR)</strong> and <strong>mMTC (Sensors)</strong> to guarantee sub-millisecond latency for <strong>URLLC (Autonomous Vehicles)</strong>.
+            </p>
+            <button className="alert-dismiss-btn" onClick={() => setIsOverloaded(false)}>Acknowledge & Continue</button>
+          </div>
+        </div>
+      )}
       <header className="nexus-header">
         <div className="logo-section">
           <Server size={28} className="brand-icon" />
@@ -68,18 +98,34 @@ function App() {
                    <span>Total Server Capacity</span>
                    <span>{gameState.slices.total_allocated.toFixed(0)} / {gameState.slices.total_capacity} Mbps</span>
                  </div>
-                 <div style={{height: '6px', background: '#E2E8F0', borderRadius: '4px', overflow: 'hidden'}}>
-                   <div style={{
-                     height: '100%', 
-                     width: `${Math.min(100, (gameState.slices.total_allocated / gameState.slices.total_capacity) * 100)}%`, 
-                     backgroundColor: gameState.slices.total_allocated >= gameState.slices.total_capacity ? '#E11D48' : '#0284C7',
-                     transition: 'width 0.3s ease'
-                   }}></div>
+                 <div style={{ paddingRight: '20%', position: 'relative', marginTop: '10px' }}>
+                     <div style={{
+                        position: 'absolute', right: '20%', top: '-4px', bottom: '-4px', width: '2px', 
+                        backgroundColor: 'rgba(2, 132, 199, 0.4)', zIndex: 5, borderRight: '1px dashed #0284C7'
+                     }}></div>
+                     <div style={{
+                       height: '8px', 
+                       background: '#E2E8F0', 
+                       borderRadius: '4px', 
+                       width: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '120%' : '100%',
+                       transition: 'width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                       position: 'relative',
+                       border: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '1px solid #E11D48' : 'none',
+                       boxShadow: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '0 0 12px rgba(225, 29, 72, 0.4)' : 'none'
+                     }}>
+                       <div className={(gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.8 ? 'buffering' : ''} style={{
+                         height: '100%', 
+                         width: `${Math.min(100, (gameState.slices.total_allocated / (gameState.slices.total_capacity * ((gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? 1.2 : 1.0))) * 100)}%`, 
+                         background: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? 'linear-gradient(90deg, #0284C7 80%, #E11D48 100%)' : '#0284C7',
+                         transition: 'width 0.3s ease, background 0.3s ease',
+                         borderRadius: '3px'
+                       }}></div>
+                     </div>
                  </div>
                </div>
             )}
           </div>
-          <SliceDashboard slices={gameState.slices.slices || []} />
+          <SliceDashboard slices={gameState.slices.slices || []} isOverloaded={isOverloaded} />
         </section>
 
         {/* Center Column: Radar/Beamforming */}
@@ -106,15 +152,24 @@ function App() {
           <div className="spawn-controls">
             <h3>Inject Traffic</h3>
             <div className="spawn-buttons">
-              <button className="btn-urllc" onClick={() => handleSpawn('URLLC')}>
-                + Auto Vehicle (URLLC)
-              </button>
-              <button className="btn-embb" onClick={() => handleSpawn('eMBB')}>
-                + 4K VR Headset (eMBB)
-              </button>
-              <button className="btn-mmtc" onClick={() => handleSpawn('mMTC')}>
-                + 10x Sensors (mMTC)
-              </button>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button className="btn-urllc" style={{flex: 1}} onClick={() => handleSpawn('URLLC')}>
+                  + Auto Vehicle (URLLC)
+                </button>
+                <button className="btn-urllc" style={{padding: '14px', width: '45px', display: 'flex', justifyContent: 'center'}} onClick={() => handleRemove('URLLC')}>-</button>
+              </div>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button className="btn-embb" style={{flex: 1}} onClick={() => handleSpawn('eMBB')}>
+                  + 4K VR Headset (eMBB)
+                </button>
+                <button className="btn-embb" style={{padding: '14px', width: '45px', display: 'flex', justifyContent: 'center'}} onClick={() => handleRemove('eMBB')}>-</button>
+              </div>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button className="btn-mmtc" style={{flex: 1}} onClick={() => handleSpawn('mMTC')}>
+                  + 10x Sensors (mMTC)
+                </button>
+                <button className="btn-mmtc" style={{padding: '14px', width: '45px', display: 'flex', justifyContent: 'center'}} onClick={() => handleRemove('mMTC')}>-</button>
+              </div>
             </div>
             
             <div className="scenario-log" style={{marginTop: '2rem', padding: '1rem', background: '#F8FAFC', borderRadius: '8px', fontSize: '0.8rem', borderLeft: '4px solid #0284C7', color: '#334155', lineHeight: '1.5'}}>

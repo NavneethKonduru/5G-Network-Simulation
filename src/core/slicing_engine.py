@@ -28,14 +28,14 @@ class NetworkSlice:
         }
 
 class SliceManager:
-    def __init__(self, total_bandwidth_mbps: float = 6000.0):
+    def __init__(self, total_bandwidth_mbps: float = 50000.0):
         self.total_bandwidth = total_bandwidth_mbps
         self.slices: Dict[str, NetworkSlice] = {}
         
-        # Default 5G Slices (Total 6000 Mbps)
-        self.add_slice("SLICE_URLLC", "URLLC", guaranteed_bw=2000.0, max_latency_ms=1.0)
-        self.add_slice("SLICE_eMBB", "eMBB", guaranteed_bw=4000.0, max_latency_ms=20.0)
-        self.add_slice("SLICE_mMTC", "mMTC", guaranteed_bw=1000.0, max_latency_ms=100.0)
+        # Default 5G Slices (Total 50000 Mbps)
+        self.add_slice("SLICE_URLLC", "URLLC", guaranteed_bw=15000.0, max_latency_ms=1.0)
+        self.add_slice("SLICE_eMBB", "eMBB", guaranteed_bw=25000.0, max_latency_ms=20.0)
+        self.add_slice("SLICE_mMTC", "mMTC", guaranteed_bw=10000.0, max_latency_ms=100.0)
         
     def add_slice(self, slice_id, slice_type, guaranteed_bw, max_latency_ms):
         self.slices[slice_id] = NetworkSlice(slice_id, slice_type, guaranteed_bw, max_latency_ms)
@@ -50,16 +50,16 @@ class SliceManager:
         # 1. Fulfill URLLC demands first
         urllc = self.slices.get("SLICE_URLLC")
         if urllc:
-            demand = urllc.active_clients * 500.0 # 500 Mbps per autonomous car
+            demand = urllc.active_clients * 2500.0 # 2500 Mbps per autonomous car
             allocated = min(demand, remaining_bw)
-            urllc.allocated_bw = max(allocated, urllc.guaranteed_bw * 0.1)
+            urllc.allocated_bw = max(allocated, urllc.guaranteed_bw * 0.1) if urllc.active_clients > 0 else 0.0
             urllc.current_load = (demand / urllc.guaranteed_bw) * 100 if urllc.guaranteed_bw > 0 else 0
             remaining_bw -= urllc.allocated_bw
 
         # 2. Fulfill eMBB demands
         embb = self.slices.get("SLICE_eMBB")
         if embb:
-            demand = embb.active_clients * 2000.0 # 2000 Mbps per 4K VR streaming cluster
+            demand = embb.active_clients * 5000.0 # 5000 Mbps per 4K VR streaming cluster
             allocated = min(demand, remaining_bw)
             embb.allocated_bw = allocated
             embb.current_load = (demand / embb.guaranteed_bw) * 100 if embb.guaranteed_bw > 0 else 0
@@ -70,10 +70,13 @@ class SliceManager:
         # 3. Fulfill mMTC demands
         mmtc = self.slices.get("SLICE_mMTC")
         if mmtc:
-            demand = mmtc.active_clients * 500.0 # 500 Mbps per IoT cluster
+            demand = mmtc.active_clients * 1000.0 # 1000 Mbps per IoT cluster
             allocated = min(demand, remaining_bw)
             mmtc.allocated_bw = allocated
             mmtc.current_load = (demand / mmtc.guaranteed_bw) * 100 if mmtc.guaranteed_bw > 0 else 0
+            if demand > mmtc.allocated_bw:
+                mmtc.packets_dropped += int((demand - mmtc.allocated_bw) / 10)
+            remaining_bw -= mmtc.allocated_bw
 
     def tick(self):
         for s in self.slices.values():

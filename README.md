@@ -1,12 +1,20 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Ericsson_logo.svg/1024px-Ericsson_logo.svg.png" width="100" />
-  <h1>🌐 5G Nexus Orchestrator</h1>
-  <p><strong>Enterprise-Grade 5G Core Network Slicing & Massive MIMO Simulator</strong></p>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Ericsson_logo.svg/1024px-Ericsson_logo.svg.png" width="120" />
+  <br/><br/>
+  
+  # 📡 5G Nexus Orchestrator
+  **Enterprise-Grade 5G Core Network Slicing & Massive MIMO Simulator**
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Python](https://img.shields.io/badge/Backend-Python_3.9+-3776AB?logo=python&logoColor=white)](#)
+  [![React](https://img.shields.io/badge/Frontend-React_Vite-61DAFB?logo=react&logoColor=black)](#)
+  [![WebSockets](https://img.shields.io/badge/Realtime-Socket.IO-010101?logo=socket.io&logoColor=white)](#)
+  
+  <br/>
 </div>
 
----
-
 ## ⚡ Overview
+
 The **5G Nexus Orchestrator** is a cutting-edge Python and React-based simulation engine designed to mathematically and visually demonstrate next-generation 5G telecommunications architectures. 
 
 Unlike traditional ad-hoc MANET simulators that focus on omnidirectional path-loss, this project models a **5G Edge Core** responsible for dynamic Quality of Service (QoS) throttling, mmWave Beamforming, and Network Slicing.
@@ -15,24 +23,27 @@ Unlike traditional ad-hoc MANET simulators that focus on omnidirectional path-lo
 
 ## 🎯 Core Engineering Features
 
-### 1. Dynamic Network Slicing & QoS
-The Python Core orchestrates a strictly prioritized bandwidth pool across three primary 5G slices:
-- 🔴 **URLLC (Ultra-Reliable Low Latency Communications)**: Guaranteed sub-millisecond latency. Priority 1 routing designed for Autonomous Vehicles and remote surgery.
-- 🔵 **eMBB (Enhanced Mobile Broadband)**: High-bandwidth slice for 4K VR/AR Streaming.
-- 🟢 **mMTC (Massive Machine Type Communications)**: Low-bandwidth, high-density slice for thousands of IoT sensors.
+### 1. Dynamic Network Slicing & Statistical Multiplexing
+The Python Core orchestrates a strictly prioritized bandwidth pool across three primary 5G slices, operating with a **50 Gbps Total Edge Server Capacity**:
 
-> **The Physics Engine** actively monitors network saturation. If the total requested bandwidth exceeds the `10,000 Mbps` edge server capacity, the engine will aggressively throttle (packet drop) the eMBB and mMTC slices to guarantee the URLLC Service Level Agreement (SLA).
+| Slice Type | Primary Use Case | Priority | Guaranteed BW | Overdrive Load Limit |
+|:---:|:---|:---:|:---:|:---:|
+| 🔴 **URLLC** | Autonomous Vehicles, Remote Surgery | **Critical (1st)** | 15,000 Mbps | Dynamic up to 50 Gbps |
+| 🔵 **eMBB** | 4K VR/AR Streaming, Mobile Broadband | High (2nd) | 25,000 Mbps | Dynamic up to 50 Gbps |
+| 🟢 **mMTC** | IoT Sensor Swarms, Smart Cities | Standard (3rd) | 10,000 Mbps | Dynamic up to 50 Gbps |
 
-### 2. Massive MIMO & Beam Steering
-Traditional Wi-Fi radiates power in a circle. 5G mmWave utilizes **Massive MIMO array gains** to physically steer concentrated beams of RF energy at moving targets.
-- The `BeamformingEngine` calculates direct trigonometric steering vectors and beamwidths dynamically.
-- The React visualizer renders these vectors as directional microwave cones tracking the User Equipment (UE).
+> 🚨 **Physics Engine Throttling**: The engine actively monitors network saturation. Because of 5G Statistical Multiplexing, slices can dynamically borrow bandwidth up to the full 50 Gbps. However, if the server is full, the engine will aggressively throttle and physically drop packets for eMBB and mMTC to guarantee the URLLC Service Level Agreement (SLA).
+
+### 2. Massive MIMO & Beam Steering Engine
+Traditional Wi-Fi radiates power in an inefficient circle. 5G mmWave utilizes **Massive MIMO array gains** to physically steer concentrated beams of RF energy at moving targets.
+
+- 📐 The `BeamformingEngine` calculates direct trigonometric steering vectors in real-time at 15Hz.
+- 🌊 **Smooth Fluid Animations**: The React visualizer renders these vectors as directional microwave cones, featuring animated high-speed data flow particles (» / «) that dynamically trace the uplink/downlink telemetry at varying sizes based on the UE slice requirement.
+- 🧲 **Anti-Overlap Physics**: A custom repulsion algorithm actively prevents beams and devices from dangerously overlapping in dense sectors.
 
 ### 3. Enterprise Dashboard Visualization
 The frontend eschews typical "hacker" UI tropes in favor of a pristine, professional **Ericsson/Cisco-style Enterprise Dashboard**.
-- High-performance **HTML5 Canvas** rendering for MIMO beams.
-- Live-updating CSS-Grid telemetry metrics.
-- Asynchronous multi-threaded Python backend bridged via low-latency `Socket.IO`.
+- Features reactive, high-contrast animated **Overload Buffer Gauges** that physically extend and glow red when network pressure exceeds safe limits (80% for Slices, 50% for Total Server).
 
 ---
 
@@ -61,5 +72,7 @@ The core slicing algorithms are backed by a rigorous Python `unittest` suite tha
 python3 src/test_5g_core.py
 ```
 
----
-*Built as a capstone exploration into next-generation 5G cellular architectures.*
+<div align="center">
+  <br/>
+  <i>Built as a capstone exploration into next-generation 5G cellular architectures.</i>
+</div>

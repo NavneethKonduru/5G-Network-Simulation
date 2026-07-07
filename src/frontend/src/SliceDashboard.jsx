@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Video, Cpu } from 'lucide-react';
 
-const SliceDashboard = ({ slices }) => {
+const SliceDashboard = ({ slices, isOverloaded }) => {
   const getIcon = (type) => {
     switch(type) {
       case 'URLLC': return <ShieldAlert size={20} color="#E63946" />;
@@ -14,7 +14,7 @@ const SliceDashboard = ({ slices }) => {
   return (
     <div className="slices-container">
       {slices.map((slice) => (
-        <div key={slice.slice_id} className={`slice-card ${slice.type.toLowerCase()}`}>
+        <div key={slice.slice_id} className={`slice-card ${slice.type.toLowerCase()} ${(isOverloaded && slice.type !== 'URLLC') ? 'throttled' : ''}`}>
           <div className="slice-header">
             {getIcon(slice.type)}
             <div>
@@ -39,11 +39,24 @@ const SliceDashboard = ({ slices }) => {
             </div>
           </div>
 
-          <div className="progress-bar-bg">
-             <div className="progress-bar-fill" style={{
-               width: `${slice.load}%`, 
-               backgroundColor: slice.load > 90 ? '#E63946' : '#457B9D'
-             }}></div>
+          <div style={{ paddingRight: '10%', position: 'relative', marginTop: '10px' }}>
+            <div style={{
+               position: 'absolute', right: '10%', top: '-4px', bottom: '-4px', width: '2px', 
+               backgroundColor: 'rgba(69, 123, 157, 0.4)', zIndex: 5, borderRight: '1px dashed #457B9D'
+            }}></div>
+            <div className="progress-bar-bg" style={{ 
+                width: slice.load > 80 ? '110%' : '100%',
+                transition: 'width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                position: 'relative',
+                border: slice.load > 80 ? '1px solid #E11D48' : 'none',
+                boxShadow: slice.load > 80 ? '0 0 10px rgba(225, 29, 72, 0.3)' : 'none'
+            }}>
+               <div className={`progress-bar-fill ${slice.load > 90 ? 'buffering' : ''}`} style={{
+                 width: `${Math.min(100, (slice.load / (slice.load > 80 ? 110 : 100)) * 100)}%`, 
+                 background: slice.load > 80 ? 'linear-gradient(90deg, #457B9D 80%, #E63946 100%)' : '#457B9D',
+                 transition: 'width 0.3s ease, background 0.3s ease'
+               }}></div>
+            </div>
           </div>
 
           <div className="packet-stats">
