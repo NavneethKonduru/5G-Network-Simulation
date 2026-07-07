@@ -101,8 +101,8 @@ const BeamVisualizer = ({ aps, clients, beams, mappings }) => {
           const apPos = aps[ap_id];
           if (!apPos) return;
           
-          const ap_x = apPos[0] * (width/1000);
-          const ap_y = apPos[1] * (height/1000);
+          const ap_x = width / 2;
+          const ap_y = height / 2;
 
           beams[ap_id].forEach(beam => {
             const sliceReq = mappings[beam.target] || 'mMTC';
@@ -207,8 +207,8 @@ const BeamVisualizer = ({ aps, clients, beams, mappings }) => {
       if (aps) {
         Object.keys(aps).forEach(ap_id => {
            const apPos = aps[ap_id];
-           const x = apPos[0] * (width/1000);
-           const y = apPos[1] * (height/1000);
+           const x = width / 2;
+           const y = height / 2;
            
            // AP Halo
            ctx.beginPath();
