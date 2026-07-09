@@ -18,8 +18,8 @@ const SliceDashboard = ({ slices, isOverloaded }) => {
           <div className="slice-header">
             {getIcon(slice.type)}
             <div>
-              <h3 style={{margin:0, fontSize: '1rem', color: '#1D3557'}}>{slice.type} Slice</h3>
-              <span style={{fontSize: '0.7rem', color: '#6C757D'}}>Target Latency: {slice.latency_target}ms</span>
+              <h3 style={{margin:0, fontSize: '1rem', color: 'var(--text-primary)', transition: 'color 0.4s ease'}}>{slice.type} Slice</h3>
+              <span style={{fontSize: '0.7rem', color: 'var(--text-secondary)', transition: 'color 0.4s ease'}}>Target Latency: {slice.latency_target}ms</span>
             </div>
             <div className="active-badge">{slice.active_clients} UEs</div>
           </div>
@@ -35,7 +35,7 @@ const SliceDashboard = ({ slices, isOverloaded }) => {
             </div>
             <div className="metric">
               <label>Load %</label>
-              <span style={{color: slice.load > 90 ? '#E63946' : '#2A9D8F'}}>{slice.load}%</span>
+              <span style={{color: slice.load > 90 ? 'var(--accent-red)' : 'var(--accent-green)', transition: 'color 0.4s ease'}}>{slice.load}%</span>
             </div>
           </div>
 
@@ -60,8 +60,8 @@ const SliceDashboard = ({ slices, isOverloaded }) => {
           </div>
 
           <div className="packet-stats">
-            <span>Processed: {slice.processed.toLocaleString()}</span>
-            <span style={{color: slice.dropped > 0 ? '#E63946' : '#6C757D'}}>Dropped: {slice.dropped.toLocaleString()}</span>
+            <span style={{transition: 'color 0.4s ease'}}>Processed: {slice.processed.toLocaleString()}</span>
+            <span style={{color: slice.dropped > 0 ? 'var(--accent-red)' : 'var(--text-secondary)', transition: 'color 0.4s ease'}}>Dropped: {slice.dropped.toLocaleString()}</span>
           </div>
         </div>
       ))}

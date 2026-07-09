@@ -3,13 +3,25 @@ import { io } from 'socket.io-client';
 import './App.css';
 import BeamVisualizer from './BeamVisualizer';
 import SliceDashboard from './SliceDashboard';
-import { Activity, Server, Radio, Database } from 'lucide-react';
+import { Activity, Server, Radio, Database, Sun, Moon } from 'lucide-react';
 
 const socket = io('http://localhost:5001');
 
 function App() {
   const [gameState, setGameState] = useState(null);
   const [isOverloaded, setIsOverloaded] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('nexus-theme') || 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('nexus-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   useEffect(() => {
     socket.on('5g_state', (data) => {
@@ -32,10 +44,13 @@ function App() {
   }, [gameState?.slices?.total_allocated, gameState?.slices?.total_capacity]);
 
   const handleSpawn = (sliceType) => {
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * 250 + 150; // Random radius between 150 and 400
+    
     socket.emit('spawn_client', {
-      id: `UE_${Math.floor(Math.random() * 1000)}`,
-      x: Math.floor(Math.random() * 800) + 100,
-      y: Math.floor(Math.random() * 800) + 100,
+      id: `UE_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`,
+      x: 500 + Math.cos(angle) * r,
+      y: 500 + Math.sin(angle) * r,
       slice: sliceType
     });
   };
@@ -45,10 +60,7 @@ function App() {
   };
 
   const handleClear = () => {
-    if(!gameState) return;
-    Object.keys(gameState.clients).forEach(id => {
-      socket.emit('remove_client', {id});
-    });
+    socket.emit('clear_all_clients');
   };
 
   if (!gameState) {
@@ -81,6 +93,9 @@ function App() {
           <div className="status-pill active"><Activity size={14}/> CORE ONLINE</div>
           <div className="status-pill"><Radio size={14}/> gNodeB ACTIVE</div>
           <div className="status-pill"><Database size={14}/> EDGE COMPUTE</div>
+          <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+            {theme === 'dark' ? <Sun size={18} className="theme-icon" /> : <Moon size={18} className="theme-icon" />}
+          </button>
         </div>
       </header>
 
@@ -93,8 +108,8 @@ function App() {
               <button className="clear-btn" onClick={handleClear}>RESET</button>
             </div>
             {gameState.slices && gameState.slices.total_capacity && (
-               <div style={{width: '100%', padding: '10px', background: '#F1F5F9', borderRadius: '8px', border: '1px solid #CBD5E1'}}>
-                 <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', fontWeight: 'bold', color: '#334155'}}>
+               <div style={{width: '100%', padding: '10px', background: 'var(--dashboard-bar-bg)', borderRadius: '8px', border: '1px solid var(--dashboard-border)', transition: 'background-color 0.4s ease, border-color 0.4s ease'}}>
+                 <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', fontWeight: 'bold', color: 'var(--text-secondary)'}}>
                    <span>Total Server Capacity</span>
                    <span>{gameState.slices.total_allocated.toFixed(0)} / {((gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? gameState.slices.total_capacity * 1.2 : gameState.slices.total_capacity).toFixed(0)} Mbps</span>
                  </div>
@@ -105,10 +120,10 @@ function App() {
                      }}></div>
                      <div style={{
                        height: '8px', 
-                       background: '#E2E8F0', 
+                       background: 'var(--dashboard-border)', 
                        borderRadius: '4px', 
                        width: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '120%' : '100%',
-                       transition: 'width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                       transition: 'width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.4s ease',
                        position: 'relative',
                        border: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '1px solid #E11D48' : 'none',
                        boxShadow: (gameState.slices.total_allocated / gameState.slices.total_capacity) > 0.5 ? '0 0 12px rgba(225, 29, 72, 0.4)' : 'none'
@@ -139,6 +154,7 @@ function App() {
                 clients={gameState.clients} 
                 beams={gameState.beams} 
                 mappings={gameState.mappings}
+                theme={theme}
               />
           </div>
         </section>
@@ -172,8 +188,8 @@ function App() {
               </div>
             </div>
             
-            <div className="scenario-log" style={{marginTop: '2rem', padding: '1rem', background: '#F8FAFC', borderRadius: '8px', fontSize: '0.8rem', borderLeft: '4px solid #0284C7', color: '#334155', lineHeight: '1.5'}}>
-              <strong style={{display: 'block', marginBottom: '8px', color: '#0F172A'}}>Simulation Objective:</strong>
+            <div className="scenario-log" style={{marginTop: '2rem', padding: '1rem', background: 'var(--card-hover-bg)', borderRadius: '8px', fontSize: '0.8rem', borderLeft: '4px solid var(--accent-blue)', color: 'var(--text-secondary)', lineHeight: '1.5', transition: 'background-color 0.4s ease, color 0.4s ease'}}>
+              <strong style={{display: 'block', marginBottom: '8px', color: 'var(--text-primary)', transition: 'color 0.4s ease'}}>Simulation Objective:</strong>
               Monitor the Edge Server's QoS response under load. As eMBB traffic consumes bandwidth, spawning a URLLC client forces the 5G Core to aggressively throttle lower-priority streams to guarantee 1ms latency for mission-critical applications.
             </div>
           </div>
